@@ -70,26 +70,41 @@ A snapshot of the GUI with its plotting functions is shown in Figure 3. The obje
 ---
 
 ### 3.2. 	Basic Usage of DataViewer GUI
-Before use, you must download one of the compatible datasets. The master set of all data may be downloaded as a single .zip file here, or individual datasets may be accessed using the links below:
--	Phase 1 – TE2 Maneuvers
--	Phase 2 – TE2 Environment Tests
--	Phase2 – TE2 Maneuvers
+Before use, you must download one of the compatible datasets. Links to an archived, open-access repository are forthcoming. In the meantime, the temporary links below may be used:
+- [Phase 1 Tests](https://drive.google.com/open?id=1e0DLBek7M257VSFrddDmc4802IFqwHpd&authuser=cmharwoo%40umich.edu&usp=drive_fs)
+- [Phase 2 Environment Tests](https://drive.google.com/open?id=1hAF4l48xnB0Fq67qY7Ptd32eRHKidBud&authuser=cmharwoo%40umich.edu&usp=drive_fs)
+- [Phase 2 Maneuvers *Recommended*](https://drive.google.com/open?id=1dtbdVe5fL-kzu15kbDvr5O52UdOqS9Z-&authuser=cmharwoo%40umich.edu&usp=drive_fs)
 
 1.	There are two ways to load data:
-a.	Click *Open Raw Data File(s)*: This allows you to load one or more trial datasets from the chronologically-ordered database. Select one or more .mat files. Each .mat file is the result of a single data acquisition session. You may select an arbitrary number of .mat files. Consult the Master_RunList.xlsx table to find runs matching specific conditions of interest.
-b.	Click *Open Test Condition Group*: This will load a subset of trials and subtrials that have have been grouped by run conditions and similarity of response. Runs have been clustered using a heirarchical clustering technique so that a larger ensemble of similar trials can be loaded without the need to manually find those with similar responses. 
+
+..a.	Click *Open Raw Data File(s)*: This allows you to load one or more trial datasets from the chronologically-ordered database. Select one or more .mat files. Each .mat file is the result of a single data acquisition session. You may select an arbitrary number of .mat files. Consult the Master_RunList.xlsx table to find runs matching specific conditions of interest.
+
+..b.	Click *Open Test Condition Group*: This will load a subset of trials and subtrials that have have been grouped by run conditions and similarity of response. Runs have been clustered using a heirarchical clustering technique so that a larger ensemble of similar trials can be loaded without the need to manually find those with similar responses. 
+
 2.	The various listboxes in the GUI will self-populate with the names of available signals of each type. NOTE: when multiple .mat files are loaded simultaneously, only the signals common to both files will be shown here. E.g. If Trial001 contains thrust measurements, but Trial002 does not, then the thrust measurements will be omitted when both Trial001 and Trial002 are loaded simultaneously.
+
 3.	Check that the *File(s) Currently Open* window has been populated with your selected files. The *Run Parameters & Metadata* window contains a table of the experimental conditions for each of the selected trials. Use the scroll-bar to view additional details.
+
 4.	Click *List of Signals* to view a catalog of all signals available in the selected trial(s).
+
 5.	Click *Wave Sensor Locations* to view a 3D model of the wave basin with the locations of each wave measurement instrument for the currently-loaded trial.
+
 6.	Select one or more signals from the populated listboxes. Use the CTRL+click to select/de-select multiple signals. You may select as many as desired.
+
 7.	Select at least one sub-trial from the *Select Sub-Trials* listbox. Use CTRL+click to select or deselect.
+
 8.	Click *Plot Selection* to view the resulting timeseries plots. (Note that this will close any currently-open time-series plot windows). Plotting can be performed in two ways
+
 ..a.	*Sub-Trials Sequential* will cause all data to be plotted against global time, so that sequential sub-trials are plotted in order. 
+
 ..b.	*Sub-Trials Overlaid* will align the moment at which the MQS robot was released for each sub-trial and set that time to T=0. Each subtrial will also be trimmed to the pre- and post- release window times.
+
 9.	Select/de-select sub-trials as needed to remove outliers, etc. Adjust the windowing of the sub-trial using the *Seconds Pre-Release* and *Seconds Post-Release*. Note that the windowing settings will affect the times used for plotting, exporting, and calculation of ensembles across sub-trials. 
+
 10.	Click *Plot Ensemble Average* to generate a figure showing the ensemble mean and standard deviation across the selected sub-trials. This will close any currently-open ensemble average plot windows.
+
 11. Click *Plot Custom X vs Y* to select the independent and dependent variables for plotting. The selected subtrials will be averaged and the ensemble mean will be plotted with a one-sigma envelope around it (determined from the covariance in X-Y pairs at each timestep). Note that this is similar to the *Plot Ensemble Average* function, but allows an arbitrary selection of independent variable X.
+
 12.	Click *FFT* to plot the frequency spectra of the selected signals and sub-trials. A mean spectrum will be overlaid onto each window. This will close any currently-open FFT plot windows.
 13.	Click *Export Selection to TXT*. Specify a filename. ALL measurement signals will be exported to a tab-delimited ASCII text file, with time dictated by the window size settings. One txt file will be created per sub-trial, with the filename: *[YOUR_FILENAME]_RUNID_Rep[Sub_Trial#].txt*. You can select whether or not to re-interpolate each subtrial to a common (relative) time vector. A signal list will also be generated, containing a tabulation of the signal metadata.
 14.	Click *Play Videos*. One child window will open per loaded trial. Each window will contain an HTML table listing available videos of that experimental trial. Click on any cell in a row to open the video in an internet browser window. 

@@ -5,7 +5,7 @@ Each data collection (3-12 sub-trials) is saved as a single data structure, name
  
  ![GUI Snapshot](imgs/Fig1.png?raw=true "Example time-history")
  
-Figure 1. Example of X and Y velocities of the robot as functions of time. Five sub-trials can be seen in the single 600-second time record, each highlighted as a colored trace.
+*Figure 1.* Example of X and Y velocities of the robot as functions of time. Five sub-trials can be seen in the single 600-second time record, each highlighted as a colored trace.
 
 ---
 
@@ -13,7 +13,8 @@ Figure 1. Example of X and Y velocities of the robot as functions of time. Five 
 The final format is depicted graphically in Figure 2. Each trial is stored as a single data structure containing a single ‘Info’ field with all run parameters and a collection of data type fields and a ‘Data’ field containing all measured data types as sub-fields. Each data type field contains individual data streams grouped together under that type (e.g. ‘Roll’, ‘Pitch’, and ‘Yaw’ streams are grouped together in the ‘Orientation’ type). Each stream is stored as a timeseries object, with additional metadata to describe its units, measurement location, and details of the data acquisition. Each trigger used to release the MQS and begin a transit is stored as a timeseries event. Not all sub-fields are present for all data types/streams. Data from Phase 1 tests and the more-recent Phase 2 tests have been consolidated using this structured format.
  
  ![GUI Snapshot](imgs/Fig2.png?raw=true "Data Structure")
-Figure 2. Format of final data structure used to disseminate experimental data. Fields enclosed in square brackets […] are not present for all data types or streams.
+
+*Figure 2.* Format of final data structure used to disseminate experimental data. Fields enclosed in square brackets […] are not present for all data types or streams.
 
 ### 1.2. 	Clustering
 Each set of test conditions was replicated for at least two data collection periods. While conditions were controlled as carefully as possible, we sometimes observed bifurcations in the robot’s response. These were attributed to either (a) failure of the wavemakers or robot actuation or (b) the zero-crossing of the wavemakers (on which the model release was triggered) was 180 degrees out of phase. As a result, the chronologically ordered raw data contains several potential response patterns for each set of experimental conditions. 
@@ -23,7 +24,7 @@ Note that the clustered data are no different from the raw data; they are simply
 
 ![GUI Snapshot](imgs/Fig3.png?raw=true "Clustering")
 
-Figure 3. Clustering of wave gauge signals, showing one outlier (wavemaker error) and two self-similar groups with a 180-degree phase shift, caused by the MQS releasing on either a rising or falling stroke of the wavemaker.
+*Figure 3.* Clustering of wave gauge signals, showing one outlier (wavemaker error) and two self-similar groups with a 180-degree phase shift, caused by the MQS releasing on either a rising or falling stroke of the wavemaker.
 
 ---
 
@@ -64,7 +65,7 @@ A snapshot of the GUI with its plotting functions is shown in Figure 3. The obje
  
  ![GUI Snapshot](imgs/Fig4.png?raw=true "Snapshot of GUI")
  
- Figure 4. Snapshot of GUI and functions
+ *Figure 4.* Snapshot of GUI and functions
  
 ---
 

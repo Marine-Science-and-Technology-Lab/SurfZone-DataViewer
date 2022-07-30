@@ -6,12 +6,12 @@ Each data collection (3-12 sub-trials) is saved as a single data structure, name
 Figure 1. Example of X and Y velocities of the robot as functions of time. Five sub-trials can be seen in the single 600-second time record, each highlighted as a colored trace.
 
 
-#1.1. 	Data Format
+# 1.1. 	Data Format
 The final format is depicted graphically in Figure 2. Each trial is stored as a single data structure containing a single ‘Info’ field with all run parameters and a collection of data type fields and a ‘Data’ field containing all measured data types as sub-fields. Each data type field contains individual data streams grouped together under that type (e.g. ‘Roll’, ‘Pitch’, and ‘Yaw’ streams are grouped together in the ‘Orientation’ type). Each stream is stored as a timeseries object, with additional metadata to describe its units, measurement location, and details of the data acquisition. Each trigger used to release the MQS and begin a transit is stored as a timeseries event. Not all sub-fields are present for all data types/streams. Data from Phase 1 tests and the more-recent Phase 2 tests have been consolidated using this structured format.
  
 Figure 2. Format of final data structure used to disseminate experimental data. Fields enclosed in square brackets […] are not present for all data types or streams.
 
-#1.2. 	Clustering
+# 1.2. 	Clustering
 Each set of test conditions was replicated for at least two data collection periods. While conditions were controlled as carefully as possible, we sometimes observed bifurcations in the robot’s response. These were attributed to either (a) failure of the wavemakers or robot actuation or (b) the zero-crossing of the wavemakers (on which the model release was triggered) was 180 degrees out of phase. As a result, the chronologically ordered raw data contains several potential response patterns for each set of experimental conditions. 
 To make it easier to assess ensembles of similar data, a hierarchical clustering technique was used to remove outliers and sort data into self-similar groups or “clusters.” An example of the clustering applied to a deep-water wave gauge signal is shown in Figure 3.
  
@@ -19,7 +19,7 @@ Figure 3. Clustering of wave gauge signals, showing one outlier (wavemaker error
 
 Note that the clustered data are no different from the raw data; they are simply organized into self-similar groups for each set of run conditions for easier viewing and calculation of statistics.
 
-#2. 	DataViewer GUI Description
+# 2. 	DataViewer GUI Description
 As a simpler alternative to using MATLAB to access the shared data, we have also written and published a graphical user interface (GUI) that can be used to open, view, and export desired subsets of the data contained in the shared files, in addition to overall run parameters, mass properties, and a catalog of all data included for each trial. The GUI is compatible with data from Phase 1 and Phase 2 testing. A snapshot of the GUI with its plotting functions is shown in Figure 3. The objective of the GUI is to enable easy access and viewing of experimental data, so that end-users may find desired data, choose the desired replications/transits, and plot and/or export that subset to easily-read TXT files. Among the key capabilities are:
 -	(A) The ability to load either an arbitrary number of raw trials simultaneously or a set of pre-clustered trials, so that they may be plotted against one another. 
 -	(B) A run parameters description window detailing the log entry for the run(s) being viewed, including programmed sequences, wave conditions, and experimenter comments.
@@ -35,10 +35,10 @@ As a simpler alternative to using MATLAB to access the shared data, we have also
 -	(9) Signal catalog that reports the type, name, units, sampling rate, resolution, and description of every signal available for plotting and exporting in the trial being viewed.
  
  
- ![GUI Snapshot](img/Fig4.png?raw=true "Snapshot")
-
+ ![GUI Snapshot](.imgs/Fig4.png?raw=true "Snapshot")
 Figure 4. Snapshot of GUI and functions
-#3. 	Installation Notes for DataViewer GUI
+
+# 3. 	Installation Notes for DataViewer GUI
 Several versions of the GUI are available. The best installation option will depend upon whether you have admin access and/or MATLAB installed on your computer.
 •	[RECOMMENDED] Run the DataViewer_GUI_Installer_Vxxx.exe file. This requires administrator permissions. This will install both the data viewer application and the necessary MATLAB runtime environment (unless the runtime is already installed, in which case it will only install the executable).
 

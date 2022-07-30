@@ -35,7 +35,7 @@ As a simpler alternative to using MATLAB to access the shared data, we have also
 -	(9) Signal catalog that reports the type, name, units, sampling rate, resolution, and description of every signal available for plotting and exporting in the trial being viewed.
  
  
- ![GUI Snapshot](.imgs/Fig4.png?raw=true "Snapshot")
+ ![GUI Snapshot](imgs/Fig4.png?raw=true "Snapshot")
 Figure 4. Snapshot of GUI and functions
 
 # 3. 	Installation Notes for DataViewer GUI

@@ -32,9 +32,12 @@ Note that the clustered data are no different from the raw data; they are simply
 As a simpler alternative to using MATLAB to access the shared data, this repo contains a graphical user interface (GUI) that can be used to open, view, and export desired subsets of the data contained in the shared files. The purpose of the GUI is to make the published data more accessible to end-users by allowing easy interaction with the data.
  
 Several versions of the GUI are available via the repo. The best installation option will depend upon whether you have admin access and/or MATLAB installed on your computer.
+
 - [RECOMMENDED] Run the DataViewer_GUI_Installer_Vxxx.exe file. This requires administrator permissions. This will install both the data viewer application and the necessary MATLAB runtime environment (unless the runtime is already installed, in which case it will only install the executable).
-*Note:* The installer will default to the 'program files' directory for the app installation. I recommend checking the box to create a shortcut on the desktop so the application is easier to open.
-If you lack administrator permissions on your computer, try one of the options below
+
+  *Note:* The installer will default to the 'program files' directory for the app installation. I recommend checking the box to create a shortcut on the desktop so the application is easier to open.
+
+_*If you lack administrator permissions on your computer, try one of the options below*_
 
 - If you have MATLAB 2020 or later already installed, you may run the UI_MQS_DataViewer_Vxxx.m file as a MATLAB script. No additional steps should be necessary.
 
@@ -49,18 +52,27 @@ The GUI is compatible with all published data from MQS testing.
 
 ### 3.1 Summary of Functions
 A snapshot of the GUI with its plotting functions is shown in Figure 3. The objective of the GUI is to enable easy access and viewing of experimental data, so that end-users may find desired data, choose the desired replications/transits, and plot and/or export that subset to easily-read TXT files. Among the key capabilities are:
--	(A) The ability to load either an arbitrary number of raw trials simultaneously or a set of pre-clustered trials, so that they may be plotted against one another. 
--	(B) A run parameters description window detailing the log entry for the run(s) being viewed, including programmed sequences, wave conditions, and experimenter comments.
--	(C) Plot customization area, in which any combination of recorded signals may be selected for plotting. Individual sub-trials may be selected/de-selected, and the window of time surrounding the MQS robot release trigger may be adjusted.
--	(1) Plotting functionality that allows any combination of signals to be plotted for any number of sub-trials / surf transits, across any combination of master trials. Data can be plotted sequentially (1A) (against time for the entire data collection) or in an overlay (1B) (time relative to the model release).
--	(2) Ensemble plotting will show ensemble mean and standard deviations of the selected signals for selected trials and subtrials. All data are resampled on a common timebase and aligned so that the experimental trigger event is coincident before taking cross-sectional statistics.
--	(3) FFT plotting shows individual and averaged frequency spectra for the selected signals and trials/sub-trials.
--	(4) Plot ensemble means and 1-sigma envelopes of arbitrary X-Y data pairs for selected subtrials.
--	(5) Export functionality will write a single CSV file for each of the sub-trials selected. Each CSV file contains all of the stored data, interpolated to the same timebase, along with headers to indicate the units and measurement locations.
--	(6) Video playback opens a child window with a hyperlinked list of all videos recorded for the trial being viewed. When a video is clicked, it will open in an internet browser and play from a shared cloud drive (Google drive).
--	(7) Mass property report that shows the mass, mass-center, and mass-moments-of-inertia for the version (Phase 1 or Phase 2) of the MQS being viewed.
--	(8) 3D plot showing the locations of wave measurement sensors relative to the beach and still waterplane.
--	(9) Signal catalog that reports the type, name, units, sampling rate, resolution, and description of every signal available for plotting and exporting in the trial being viewed.
+(A) The ability to load either an arbitrary number of raw trials simultaneously or a set of pre-clustered trials, so that they may be plotted against one another. 
+(B) A run parameters description window detailing the log entry for the run(s) being viewed, including programmed sequences, wave conditions, and experimenter comments.
+(C) Plot customization area, in which any combination of recorded signals may be selected for plotting. Individual sub-trials may be selected/de-selected, and the window of time surrounding the MQS robot release trigger may be adjusted.
+
+1. Plotting functionality that allows any combination of signals to be plotted for any number of sub-trials / surf transits, across any combination of master trials. Data can be plotted sequentially (1A) (against time for the entire data collection) or in an overlay (1B) (time relative to the model release).
+
+2. Ensemble plotting will show ensemble mean and standard deviations of the selected signals for selected trials and subtrials. All data are resampled on a common timebase and aligned so that the experimental trigger event is coincident before taking cross-sectional statistics.
+
+3. FFT plotting shows individual and averaged frequency spectra for the selected signals and trials/sub-trials.
+
+4. Plot ensemble means and 1-sigma envelopes of arbitrary X-Y data pairs for selected subtrials.
+
+5. Export functionality will write a single CSV file for each of the sub-trials selected. Each CSV file contains all of the stored data, interpolated to the same timebase, along with headers to indicate the units and measurement locations.
+
+6. Video playback opens a child window with a hyperlinked list of all videos recorded for the trial being viewed. When a video is clicked, it will open in an internet browser and play from a shared cloud drive (Google drive).
+
+7. Mass property report that shows the mass, mass-center, and mass-moments-of-inertia for the version (Phase 1 or Phase 2) of the MQS being viewed.
+
+8. 3D plot showing the locations of wave measurement sensors relative to the beach and still waterplane.
+
+9. Signal catalog that reports the type, name, units, sampling rate, resolution, and description of every signal available for plotting and exporting in the trial being viewed.
  
  
  ![GUI Snapshot](imgs/Fig4.png?raw=true "Snapshot of GUI")
@@ -77,9 +89,9 @@ Before use, you must download one of the compatible datasets. Links to an archiv
 
 1.	There are two ways to load data:
 
-..a.	Click *Open Raw Data File(s)*: This allows you to load one or more trial datasets from the chronologically-ordered database. Select one or more .mat files. Each .mat file is the result of a single data acquisition session. You may select an arbitrary number of .mat files. Consult the Master_RunList.xlsx table to find runs matching specific conditions of interest.
+  a.	Click *Open Raw Data File(s)*: This allows you to load one or more trial datasets from the chronologically-ordered database. Select one or more .mat files. Each .mat file is the result of a single data acquisition session. You may select an arbitrary number of .mat files. Consult the Master_RunList.xlsx table to find runs matching specific conditions of interest.
 
-..b.	Click *Open Test Condition Group*: This will load a subset of trials and subtrials that have have been grouped by run conditions and similarity of response. Runs have been clustered using a heirarchical clustering technique so that a larger ensemble of similar trials can be loaded without the need to manually find those with similar responses. 
+  b.	Click *Open Test Condition Group*: This will load a subset of trials and subtrials that have have been grouped by run conditions and similarity of response. Runs have been clustered using a heirarchical clustering technique so that a larger ensemble of similar trials can be loaded without the need to manually find those with similar responses. 
 
 2.	The various listboxes in the GUI will self-populate with the names of available signals of each type. NOTE: when multiple .mat files are loaded simultaneously, only the signals common to both files will be shown here. E.g. If Trial001 contains thrust measurements, but Trial002 does not, then the thrust measurements will be omitted when both Trial001 and Trial002 are loaded simultaneously.
 
@@ -95,18 +107,22 @@ Before use, you must download one of the compatible datasets. Links to an archiv
 
 8.	Click *Plot Selection* to view the resulting timeseries plots. (Note that this will close any currently-open time-series plot windows). Plotting can be performed in two ways
 
-..a.	*Sub-Trials Sequential* will cause all data to be plotted against global time, so that sequential sub-trials are plotted in order. 
+  a.	*Sub-Trials Sequential* will cause all data to be plotted against global time, so that sequential sub-trials are plotted in order. 
 
-..b.	*Sub-Trials Overlaid* will align the moment at which the MQS robot was released for each sub-trial and set that time to T=0. Each subtrial will also be trimmed to the pre- and post- release window times.
+  b.	*Sub-Trials Overlaid* will align the moment at which the MQS robot was released for each sub-trial and set that time to T=0. Each subtrial will also be trimmed to the pre- and post- release window times.
 
 9.	Select/de-select sub-trials as needed to remove outliers, etc. Adjust the windowing of the sub-trial using the *Seconds Pre-Release* and *Seconds Post-Release*. Note that the windowing settings will affect the times used for plotting, exporting, and calculation of ensembles across sub-trials. 
 
 10.	Click *Plot Ensemble Average* to generate a figure showing the ensemble mean and standard deviation across the selected sub-trials. This will close any currently-open ensemble average plot windows.
 
-11. Click *Plot Custom X vs Y* to select the independent and dependent variables for plotting. The selected subtrials will be averaged and the ensemble mean will be plotted with a one-sigma envelope around it (determined from the covariance in X-Y pairs at each timestep). Note that this is similar to the *Plot Ensemble Average* function, but allows an arbitrary selection of independent variable X.
+11. Click *Plot Custom X vs Y* to select the independent and dependent variables for plotting. The selected subtrials will be averaged and the ensemble mean will be plotted with a one-sigma envelope around it (determined from the covariance in X-Y pairs at each timestep). 
+
+   Note that this is similar to the *Plot Ensemble Average* function, but allows an arbitrary selection of independent variable X.
 
 12.	Click *FFT* to plot the frequency spectra of the selected signals and sub-trials. A mean spectrum will be overlaid onto each window. This will close any currently-open FFT plot windows.
+
 13.	Click *Export Selection to TXT*. Specify a filename. ALL measurement signals will be exported to a tab-delimited ASCII text file, with time dictated by the window size settings. One txt file will be created per sub-trial, with the filename: *[YOUR_FILENAME]_RUNID_Rep[Sub_Trial#].txt*. You can select whether or not to re-interpolate each subtrial to a common (relative) time vector. A signal list will also be generated, containing a tabulation of the signal metadata.
+
 14.	Click *Play Videos*. One child window will open per loaded trial. Each window will contain an HTML table listing available videos of that experimental trial. Click on any cell in a row to open the video in an internet browser window. 
 
 *Note 1:* Videos will play from a shared web location (Kaltura), so you must have internet access to use this feature.

@@ -91,8 +91,8 @@ Before use, you must download one of the compatible datasets. Links to an archiv
 - [Phase 2 Maneuvers *Recommended*](https://drive.google.com/open?id=1dtbdVe5fL-kzu15kbDvr5O52UdOqS9Z-&authuser=cmharwoo%40umich.edu&usp=drive_fs)
 
 1.	There are two ways to load data:
-   -	Click *Open Raw Data File(s)*: This allows you to load one or more trial datasets from the chronologically-ordered database. Select one or more .mat files. Each .mat file is the result of a single data acquisition session. You may select an arbitrary number of .mat files. Consult the Master_RunList.xlsx table to find runs matching specific conditions of interest.
-   -	Click *Open Test Condition Group*: This will load a subset of trials and subtrials that have have been grouped by run conditions and similarity of response. Runs have been clustered using a heirarchical clustering technique so that a larger ensemble of similar trials can be loaded without the need to manually find those with similar responses. 
+    -	Click *Open Raw Data File(s)*: This allows you to load one or more trial datasets from the chronologically-ordered database. Select one or more .mat files. Each .mat file is the result of a single data acquisition session. You may select an arbitrary number of .mat files. Consult the Master_RunList.xlsx table to find runs matching specific conditions of interest.
+    -	Click *Open Test Condition Group*: This will load a subset of trials and subtrials that have have been grouped by run conditions and similarity of response. Runs have been clustered using a heirarchical clustering technique so that a larger ensemble of similar trials can be loaded without the need to manually find those with similar responses. 
 
 2.	The various listboxes in the GUI will self-populate with the names of available signals of each type. NOTE: when multiple .mat files are loaded simultaneously, only the signals common to both files will be shown here. E.g. If Trial001 contains thrust measurements, but Trial002 does not, then the thrust measurements will be omitted when both Trial001 and Trial002 are loaded simultaneously.
 
@@ -107,8 +107,8 @@ Before use, you must download one of the compatible datasets. Links to an archiv
 7.	Select at least one sub-trial from the *Select Sub-Trials* listbox. Use CTRL+click to select or deselect.
 
 8.	Click *Plot Selection* to view the resulting timeseries plots. (Note that this will close any currently-open time-series plot windows). Plotting can be performed in two ways
-   -	*Sub-Trials Sequential* will cause all data to be plotted against global time, so that sequential sub-trials are plotted in order. 
-   - *Sub-Trials Overlaid* will align the moment at which the MQS robot was released for each sub-trial and set that time to T=0. Each subtrial will also be trimmed to the pre- and post- release window times.
+    -	*Sub-Trials Sequential* will cause all data to be plotted against global time, so that sequential sub-trials are plotted in order. 
+    - *Sub-Trials Overlaid* will align the moment at which the MQS robot was released for each sub-trial and set that time to T=0. Each subtrial will also be trimmed to the pre- and post- release window times.
 
 9.	Select/de-select sub-trials as needed to remove outliers, etc. Adjust the windowing of the sub-trial using the *Seconds Pre-Release* and *Seconds Post-Release*. Note that the windowing settings will affect the times used for plotting, exporting, and calculation of ensembles across sub-trials. 
 

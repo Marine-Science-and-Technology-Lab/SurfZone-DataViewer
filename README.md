@@ -1,41 +1,47 @@
-# SurfZone-DataViewer
-Data viewer GUI for surf-zone experiments at IIHR wave basin.
+# SurfZone-DataViewer Usage and Installation
+
 ## 1. 	Data Overview
 Each data collection (3-12 sub-trials) is saved as a single data structure, named as 'VT###_Consolidated_TS.mat' (Phase 1) or 'MT###_Consolidated_TS.mat' (phase 2). Each trial in turn contains between 3 and 12 “sub-trials,” which are nominally replications of one another. The format of the data structure is proprietary, using MATLAB timeseries objects to leverage the many object functions (plot, interpolate, split, etc) available for this datatype. Figure 1 depicts five sub-trials for run MT044, with each sub-trial indicated by a colored portion of the continuous 600-second acquisition. The division of each master run into sub-trials is automatically handled by the GUI, using event markers, shown as filled red circles indicating the beginning of each sub-trial.
  
  ![GUI Snapshot](imgs/Fig1.png?raw=true "Example time-history")
-Figure 1. Example of X and Y velocities of the robot as functions of time. Five sub-trials can be seen in the single 600-second time record, each highlighted as a colored trace.
+ 
+*Figure 1.* Example of X and Y velocities of the robot as functions of time. Five sub-trials can be seen in the single 600-second time record, each highlighted as a colored trace.
+
 ---
 
 ### 1.1. 	Data Format
 The final format is depicted graphically in Figure 2. Each trial is stored as a single data structure containing a single ‘Info’ field with all run parameters and a collection of data type fields and a ‘Data’ field containing all measured data types as sub-fields. Each data type field contains individual data streams grouped together under that type (e.g. ‘Roll’, ‘Pitch’, and ‘Yaw’ streams are grouped together in the ‘Orientation’ type). Each stream is stored as a timeseries object, with additional metadata to describe its units, measurement location, and details of the data acquisition. Each trigger used to release the MQS and begin a transit is stored as a timeseries event. Not all sub-fields are present for all data types/streams. Data from Phase 1 tests and the more-recent Phase 2 tests have been consolidated using this structured format.
  
  ![GUI Snapshot](imgs/Fig2.png?raw=true "Data Structure")
-Figure 2. Format of final data structure used to disseminate experimental data. Fields enclosed in square brackets […] are not present for all data types or streams.
+
+*Figure 2.* Format of final data structure used to disseminate experimental data. Fields enclosed in square brackets […] are not present for all data types or streams.
 
 ### 1.2. 	Clustering
 Each set of test conditions was replicated for at least two data collection periods. While conditions were controlled as carefully as possible, we sometimes observed bifurcations in the robot’s response. These were attributed to either (a) failure of the wavemakers or robot actuation or (b) the zero-crossing of the wavemakers (on which the model release was triggered) was 180 degrees out of phase. As a result, the chronologically ordered raw data contains several potential response patterns for each set of experimental conditions. 
 To make it easier to assess ensembles of similar data, a hierarchical clustering technique was used to remove outliers and sort data into self-similar groups or “clusters.” An example of the clustering applied to a deep-water wave gauge signal is shown in Figure 3.
 
-![GUI Snapshot](imgs/Fig3.png?raw=true "Clustering")
-Figure 3. Clustering of wave gauge signals, showing one outlier (wavemaker error) and two self-similar groups with a 180-degree phase shift, caused by the MQS releasing on either a rising or falling stroke of the wavemaker.
-
 Note that the clustered data are no different from the raw data; they are simply organized into self-similar groups for each set of run conditions for easier viewing and calculation of statistics.
+
+![GUI Snapshot](imgs/Fig3.png?raw=true "Clustering")
+
+*Figure 3.* Clustering of wave gauge signals, showing one outlier (wavemaker error) and two self-similar groups with a 180-degree phase shift, caused by the MQS releasing on either a rising or falling stroke of the wavemaker.
+
 ---
 
 ## 2. 	Installation Notes for DataViewer GUI
 As a simpler alternative to using MATLAB to access the shared data, this repo contains a graphical user interface (GUI) that can be used to open, view, and export desired subsets of the data contained in the shared files. The purpose of the GUI is to make the published data more accessible to end-users by allowing easy interaction with the data.
  
 Several versions of the GUI are available via the repo. The best installation option will depend upon whether you have admin access and/or MATLAB installed on your computer.
-•	[RECOMMENDED] Run the DataViewer_GUI_Installer_Vxxx.exe file. This requires administrator permissions. This will install both the data viewer application and the necessary MATLAB runtime environment (unless the runtime is already installed, in which case it will only install the executable).
-
-Note: The installer will default to the 'program files' directory for the app installation. I recommend checking the box to create a shortcut on the desktop so the application is easier to open.
+- [RECOMMENDED] Run the DataViewer_GUI_Installer_Vxxx.exe file. This requires administrator permissions. This will install both the data viewer application and the necessary MATLAB runtime environment (unless the runtime is already installed, in which case it will only install the executable).
+*Note:* The installer will default to the 'program files' directory for the app installation. I recommend checking the box to create a shortcut on the desktop so the application is easier to open.
 If you lack administrator permissions on your computer, try one of the options below
-•	If you have MATLAB 2020 or later already installed, you may run the UI_MQS_DataViewer_Vxxx.m file as a MATLAB script. No additional steps should be necessary.
 
-•	If you have a recent version of matlab (we haven’t tested exactly what years will work, but probably requires 2021a or newer), you may also run the matlab app installer. This will install the program as an application within MATLAB.
+- If you have MATLAB 2020 or later already installed, you may run the UI_MQS_DataViewer_Vxxx.m file as a MATLAB script. No additional steps should be necessary.
 
-•	If you do not have matlab, but you have the R2021A matlab runtime (version 9.10) installed, you may use the portable version of the executable by copying and unzipping the UI_MQS_DataViewer_Portable.zip folder.
+- If you have a recent version of MATLAB (we haven’t tested exactly what years will work, but probably requires 2021a or newer), you may also run the MATLAB app installer. This will install the program as an application, accessible from the 'APPS' tab within MATLAB.
+
+- If you do not have MATLAB, but you have the R2021A MATLAB runtime (version 9.10) installed, you may use the portable version of the executable by copying and unzipping the UI_MQS_DataViewer_Portable.zip folder.
+
 ---
 
 ## 3. 	DataViewer GUI
@@ -58,7 +64,9 @@ A snapshot of the GUI with its plotting functions is shown in Figure 3. The obje
  
  
  ![GUI Snapshot](imgs/Fig4.png?raw=true "Snapshot of GUI")
-Figure 4. Snapshot of GUI and functions
+ 
+ *Figure 4.* Snapshot of GUI and functions
+ 
 ---
 
 ### 3.2. 	Basic Usage of DataViewer GUI
@@ -86,5 +94,5 @@ b.	Click *Open Test Condition Group*: This will load a subset of trials and subt
 13.	Click *Export Selection to TXT*. Specify a filename. ALL measurement signals will be exported to a tab-delimited ASCII text file, with time dictated by the window size settings. One txt file will be created per sub-trial, with the filename: *[YOUR_FILENAME]_RUNID_Rep[Sub_Trial#].txt*. You can select whether or not to re-interpolate each subtrial to a common (relative) time vector. A signal list will also be generated, containing a tabulation of the signal metadata.
 14.	Click *Play Videos*. One child window will open per loaded trial. Each window will contain an HTML table listing available videos of that experimental trial. Click on any cell in a row to open the video in an internet browser window. 
 
-Note 1: Videos will play from a shared web location (Kaltura), so you must have internet access to use this feature.
-Note 2: Videos are not available for all trials. If no videos exist for your selected trial(s), the table will display a message indicating that no videos were found.
+*Note 1:* Videos will play from a shared web location (Kaltura), so you must have internet access to use this feature.
+*Note 2:* Videos are not available for all trials. If no videos exist for your selected trial(s), the table will display a message indicating that no videos were found.

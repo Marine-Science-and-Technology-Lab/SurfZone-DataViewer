@@ -52,8 +52,11 @@ The GUI is compatible with all published data from MQS testing.
 
 ### 3.1 Summary of Functions
 A snapshot of the GUI with its plotting functions is shown in Figure 3. The objective of the GUI is to enable easy access and viewing of experimental data, so that end-users may find desired data, choose the desired replications/transits, and plot and/or export that subset to easily-read TXT files. Among the key capabilities are:
+
 (A) The ability to load either an arbitrary number of raw trials simultaneously or a set of pre-clustered trials, so that they may be plotted against one another. 
+
 (B) A run parameters description window detailing the log entry for the run(s) being viewed, including programmed sequences, wave conditions, and experimenter comments.
+
 (C) Plot customization area, in which any combination of recorded signals may be selected for plotting. Individual sub-trials may be selected/de-selected, and the window of time surrounding the MQS robot release trigger may be adjusted.
 
 1. Plotting functionality that allows any combination of signals to be plotted for any number of sub-trials / surf transits, across any combination of master trials. Data can be plotted sequentially (1A) (against time for the entire data collection) or in an overlay (1B) (time relative to the model release).
@@ -88,10 +91,8 @@ Before use, you must download one of the compatible datasets. Links to an archiv
 - [Phase 2 Maneuvers *Recommended*](https://drive.google.com/open?id=1dtbdVe5fL-kzu15kbDvr5O52UdOqS9Z-&authuser=cmharwoo%40umich.edu&usp=drive_fs)
 
 1.	There are two ways to load data:
-
-  1.a.	Click *Open Raw Data File(s)*: This allows you to load one or more trial datasets from the chronologically-ordered database. Select one or more .mat files. Each .mat file is the result of a single data acquisition session. You may select an arbitrary number of .mat files. Consult the Master_RunList.xlsx table to find runs matching specific conditions of interest.
-
-  2.b.	Click *Open Test Condition Group*: This will load a subset of trials and subtrials that have have been grouped by run conditions and similarity of response. Runs have been clustered using a heirarchical clustering technique so that a larger ensemble of similar trials can be loaded without the need to manually find those with similar responses. 
+    -	Click *Open Raw Data File(s)*: This allows you to load one or more trial datasets from the chronologically-ordered database. Select one or more .mat files. Each .mat file is the result of a single data acquisition session. You may select an arbitrary number of .mat files. Consult the Master_RunList.xlsx table to find runs matching specific conditions of interest.
+    -	Click *Open Test Condition Group*: This will load a subset of trials and subtrials that have have been grouped by run conditions and similarity of response. Runs have been clustered using a heirarchical clustering technique so that a larger ensemble of similar trials can be loaded without the need to manually find those with similar responses. 
 
 2.	The various listboxes in the GUI will self-populate with the names of available signals of each type. NOTE: when multiple .mat files are loaded simultaneously, only the signals common to both files will be shown here. E.g. If Trial001 contains thrust measurements, but Trial002 does not, then the thrust measurements will be omitted when both Trial001 and Trial002 are loaded simultaneously.
 
@@ -106,10 +107,8 @@ Before use, you must download one of the compatible datasets. Links to an archiv
 7.	Select at least one sub-trial from the *Select Sub-Trials* listbox. Use CTRL+click to select or deselect.
 
 8.	Click *Plot Selection* to view the resulting timeseries plots. (Note that this will close any currently-open time-series plot windows). Plotting can be performed in two ways
-
-  *	*Sub-Trials Sequential* will cause all data to be plotted against global time, so that sequential sub-trials are plotted in order. 
-
-  * *Sub-Trials Overlaid* will align the moment at which the MQS robot was released for each sub-trial and set that time to T=0. Each subtrial will also be trimmed to the pre- and post- release window times.
+    -	*Sub-Trials Sequential* will cause all data to be plotted against global time, so that sequential sub-trials are plotted in order. 
+    - *Sub-Trials Overlaid* will align the moment at which the MQS robot was released for each sub-trial and set that time to T=0. Each subtrial will also be trimmed to the pre- and post- release window times.
 
 9.	Select/de-select sub-trials as needed to remove outliers, etc. Adjust the windowing of the sub-trial using the *Seconds Pre-Release* and *Seconds Post-Release*. Note that the windowing settings will affect the times used for plotting, exporting, and calculation of ensembles across sub-trials. 
 
@@ -117,7 +116,7 @@ Before use, you must download one of the compatible datasets. Links to an archiv
 
 11. Click *Plot Custom X vs Y* to select the independent and dependent variables for plotting. The selected subtrials will be averaged and the ensemble mean will be plotted with a one-sigma envelope around it (determined from the covariance in X-Y pairs at each timestep). 
 
-   Note that this is similar to the *Plot Ensemble Average* function, but allows an arbitrary selection of independent variable X.
+    Note that this is similar to the *Plot Ensemble Average* function, but allows an arbitrary selection of independent variable X.
 
 12.	Click *FFT* to plot the frequency spectra of the selected signals and sub-trials. A mean spectrum will be overlaid onto each window. This will close any currently-open FFT plot windows.
 

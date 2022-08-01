@@ -1,16 +1,19 @@
 # SurfZone-DataViewer Usage and Installation
 
 ## 1. 	Data Overview
-Each data collection (3-12 sub-trials) is saved as a single data structure, named as 'VT###_Consolidated_TS.mat' (Phase 1) or 'MT###_Consolidated_TS.mat' (phase 2). Each trial in turn contains between 3 and 12 “sub-trials,” which are nominally replications of one another. The format of the data structure is proprietary, using MATLAB timeseries objects to leverage the many object functions (plot, interpolate, split, etc) available for this datatype. Figure 1 depicts five sub-trials for run MT044, with each sub-trial indicated by a colored portion of the continuous 600-second acquisition. The division of each master run into sub-trials is automatically handled by the GUI, using event markers, shown as filled red circles indicating the beginning of each sub-trial.
+Data were collected continuously for 600 or 1200 seconds at constant experimental conditions. Each of these long records is referred to as a **Trial**, and contains several repeated transits or realizations of the surf zone transit. Each individual transit is termed a **Sub-Trial**. 
+Each trial is saved as a single data structure, named as 'VT###_Consolidated_TS.mat' (Phase 1) or 'MT###_Consolidated_TS.mat' (phase 2). Each trial in turn contains between 3 and 12 “sub-trials,” which are nominally replications of one another. 
+
+The format of the data structure is proprietary, using MATLAB timeseries objects to leverage the many object functions (plot, interpolate, split, etc) available for this datatype. Figure 1 depicts the X-location for Trial MT044, consisting of five sub-trials. Each sub-trial is indicated by a colored portion of the continuous 600-second acquisition. The division of each master run into sub-trials is automatically handled by the GUI, using event markers (shown as filled red circles) that indicate the moment that the MQS begins moving.
  
  ![GUI Snapshot](imgs/Fig1.png?raw=true "Example time-history")
  
-*Figure 1.* Example of X and Y velocities of the robot as functions of time. Five sub-trials can be seen in the single 600-second time record, each highlighted as a colored trace.
+*Figure 1.* Example of X position of the robot as functions of time. Five sub-trials can be seen in the single 600-second time record, each highlighted as a colored trace.
 
 ---
 
 ### 1.1. 	Data Format
-The final format is depicted graphically in Figure 2. Each trial is stored as a single data structure containing a single ‘Info’ field with all run parameters and a collection of data type fields and a ‘Data’ field containing all measured data types as sub-fields. Each data type field contains individual data streams grouped together under that type (e.g. ‘Roll’, ‘Pitch’, and ‘Yaw’ streams are grouped together in the ‘Orientation’ type). Each stream is stored as a timeseries object, with additional metadata to describe its units, measurement location, and details of the data acquisition. Each trigger used to release the MQS and begin a transit is stored as a timeseries event. Not all sub-fields are present for all data types/streams. Data from Phase 1 tests and the more-recent Phase 2 tests have been consolidated using this structured format.
+The data structure format is depicted graphically in Figure 2. Each trial is stored as a single data structure containing a single ‘Info’ field with all run parameters and a collection of data type field. Each data type field contains individual data streams grouped together under that type (e.g. ‘Roll’, ‘Pitch’, and ‘Yaw’ streams are grouped together in the ‘Orientation’ type). Each stream is stored as a timeseries object, with additional metadata to describe its units, measurement location, and details of the data acquisition. Each trigger used to release the MQS and begin a transit is stored as a timeseries event. Not all sub-fields are present for all data types/streams. Data from Phase 1 tests and the more-recent Phase 2 tests have been consolidated using this structured format.
  
  ![GUI Snapshot](imgs/Fig2.png?raw=true "Data Structure")
 

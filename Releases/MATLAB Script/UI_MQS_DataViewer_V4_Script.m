@@ -1,18 +1,18 @@
-classdef UI_MQS_DataViewer_V4_Script < matlab.apps.AppBase
+classdef UI_MQS_DataViewer_V4p0 < matlab.apps.AppBase
 
     % Properties that correspond to app components
     properties (Access = public)
         UIWaveBasinDataViewerUIFigure   matlab.ui.Figure
-        VelocitiesLabel                 matlab.ui.control.Label
+        VelocityListBox                 matlab.ui.control.ListBox
+        VelocityListBoxLabel            matlab.ui.control.Label
         GroundContactListBox            matlab.ui.control.ListBox
         GroundContactLabel              matlab.ui.control.Label
-        VelocityBodyFixedListBox        matlab.ui.control.ListBox
-        VelocityBodyFixedLabel          matlab.ui.control.Label
-        PlotCustomXvsYButton            matlab.ui.control.Button
+        VelocitiesVehicleCoordsListBox  matlab.ui.control.ListBox
+        VelocitiesVehicleCoordsListBoxLabel  matlab.ui.control.Label
+        PlotEnsembleXvsYButton          matlab.ui.control.Button
         OpenTrialClusterGroupButton     matlab.ui.control.Button
         CloseAllFiguresButton           matlab.ui.control.Button
         FFTButton                       matlab.ui.control.Button
-        PlotEnsembleAverageButton       matlab.ui.control.Button
         FilesCurrentlyOpenListBox       matlab.ui.control.ListBox
         FilesCurrentlyOpenListBoxLabel  matlab.ui.control.Label
         UITable                         matlab.ui.control.Table
@@ -50,8 +50,8 @@ classdef UI_MQS_DataViewer_V4_Script < matlab.apps.AppBase
         DeepWaterAcousticsLabel         matlab.ui.control.Label
         AngularRatesListBox             matlab.ui.control.ListBox
         AngularRatesListBoxLabel        matlab.ui.control.Label
-        AccelerationsListBox            matlab.ui.control.ListBox
-        AccelerationsListBoxLabel       matlab.ui.control.Label
+        LinearAccelerationsListBox      matlab.ui.control.ListBox
+        LinearAccelerationsListBoxLabel  matlab.ui.control.Label
         OrientationGapFilledListBox     matlab.ui.control.ListBox
         OrientationGapFilledListBoxLabel  matlab.ui.control.Label
         PositionXYZGapFilledListBox     matlab.ui.control.ListBox
@@ -625,21 +625,37 @@ classdef UI_MQS_DataViewer_V4_Script < matlab.apps.AppBase
                 %legend({strcat(barelabel,'-',descriptor)})
                 if any(cell2mat(Covariance),'all')
                     stdOutline_c1=[];
+                    iscollapsed=[];
                     for nt=1:length(timedata)
                         Sigma = Covariance{nt};
                         localStdOutline = app.calculateEllipseXY([X(nt),timedata(nt)],Sigma,n_points);
                         stdOutline_c1 = [stdOutline_c1;localStdOutline];
+                        if(Sigma(2,2)==0); %If there is no variation in the Y value, turn on the iscollapsed indicator. These values will have a small amount of white noise added to them to prevent the boundary() function from blowing up.
+                            iscollapsed=[iscollapsed;ones(size(localStdOutline,1),1)];
+                        else
+                            iscollapsed=[iscollapsed;zeros(size(localStdOutline,1),1)];
+                        end
                     end
                     if plotme == 1 %for debugging
                         hold on
                         plot(stdOutline_c1(:,1),stdOutline_c1(:,2),'ko');
                     end
                     stdOutline_c1(:,2) = scaleC1*stdOutline_c1(:,2);
-                    ind_Boundary = boundary(stdOutline_c1(:,1),stdOutline_c1(:,2),boundary_smoothness);
+                    stdOutline_temp=stdOutline_c1(:,2);
+                    
+                    % Add white noise to values with zero Y-variation
+                    N_zeros=find(iscollapsed);
+                    for nz=1:length(N_zeros);
+                        stdOutline_temp(N_zeros(nz))=0.001*(rand(1)-0.5);
+                    end
+                    
+                    ind_Boundary = boundary(stdOutline_c1(:,1),stdOutline_temp,boundary_smoothness);
                     stdOutline_c1(:,2) = 1/scaleC1*stdOutline_c1(:,2);
+                    stdOutline_temp=1/scaleC1*stdOutline_temp;
                     stdOutline_c1_bound = stdOutline_c1(ind_Boundary,:);
                     if plotme == 1 %for debugging
-                        plot(stdOutline_c1_bound(:,1),stdOutline_c1_bound(:,2),'b.');
+                        plot(stdOutline_c1(N_zeros,1),stdOutline_c1(N_zeros,2),'+g');
+                        plot(stdOutline_c1_bound(:,1),stdOutline_c1_bound(:,2),'or','MarkerSize',15);
                     end
                     env_c1 = patch('XData',stdOutline_c1_bound(:,1),'YData',stdOutline_c1_bound(:,2),'FaceColor','b','EdgeColor','none'); % Adds Display name: 'DisplayName',strcat('SD-',descriptor));
                     alpha(env_c1,0.4);
@@ -867,11 +883,11 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
                 end
 
                 %% Kinematics
-                app.AccelerationsListBox.Items=cellstr(num2str([]));
+                app.LinearAccelerationsListBox.Items=cellstr(num2str([]));
                 app.AngularRatesListBox.Items=cellstr(num2str([]));
                 try
-                    app.AccelerationsListBox.Items=fieldnames(Trial_TS.Accel);
-                    app.AccelerationsListBox.Multiselect='on';
+                    app.LinearAccelerationsListBox.Items=fieldnames(Trial_TS.Accel);
+                    app.LinearAccelerationsListBox.Multiselect='on';
 
                     app.AngularRatesListBox.Items=fieldnames(Trial_TS.AngularRates);
                     app.AngularRatesListBox.Multiselect='on';
@@ -880,12 +896,16 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
 
                 app.PositionXYZListBox.Items=cellstr(num2str([]));
                 app.OrientationListBox.Items=cellstr(num2str([]));
+                app.VelocityListBox.Items=cellstr(num2str([]));
                 try
                     app.PositionXYZListBox.Items=fieldnames(Trial_TS.Position);
                     app.PositionXYZListBox.Multiselect='on';
 
                     app.OrientationListBox.Items=fieldnames(Trial_TS.Orientation);
                     app.OrientationListBox.Multiselect='on';
+                    
+                    app.VelocityListBox.Items=fieldnames(Trial_TS.Velocities);
+                    app.VelocityListBox.Multiselect='on';
                 catch
                 end
 
@@ -914,9 +934,9 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
 
                 try
                     %% Body-fixed UVW velocities
-                    app.VelocityBodyFixedListBox.Items=cellstr(num2str([]));
-                    app.VelocityBodyFixedListBox.Items=fieldnames(Trial_TS.Body_UVW);
-                    app.VelocityBodyFixedListBox.Multiselect='on';
+                    app.VelocitiesVehicleCoordsListBox.Items=cellstr(num2str([]));
+                    app.VelocitiesVehicleCoordsListBox.Items=fieldnames(Trial_TS.Body_UVW);
+                    app.VelocitiesVehicleCoordsListBox.Multiselect='on';
                 catch
                 end
 
@@ -928,6 +948,8 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
                 catch
                 end
 
+       
+                
                 %% ROS Commands
                 app.ROSCommandsListBox.Items=cellstr(num2str([]));
                 try
@@ -1147,7 +1169,7 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
 
                         %% IMU-Accelerations
                         clear Tfig
-                        PlotFields=app.AccelerationsListBox.Value;
+                        PlotFields=app.LinearAccelerationsListBox.Value;
                         N_plots=length(PlotFields);
                         if N_plots>0
                             if TrialCount==1
@@ -1349,7 +1371,7 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
 
                         %% Body-fixed velocities
                         clear Tfig;
-                        PlotFields=app.VelocityBodyFixedListBox.Value;
+                        PlotFields=app.VelocitiesVehicleCoordsListBox.Value;
                         N_plots=length(PlotFields);
                         if N_plots>0
                             if TrialCount==1
@@ -1367,6 +1389,27 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
                             Timefig=[Timefig Tfig];
                         end
 
+                         %% Raw velocities
+                        clear Tfig;
+                        PlotFields=app.VelocityListBox.Value;
+                        N_plots=length(PlotFields);
+                        if N_plots>0
+                            if TrialCount==1
+                                Tfig.fighandle=figure('Name','Raw Earth-Fixed Velocity Components');
+                            else Tfig=Fig15;
+                            end
+
+                            for j=1:length(PlotFields)
+                                TSob=Trial_TS.Velocities.(PlotFields{j});
+
+                                Tfig = app.PlotTS(Tfig,TSob,N_plots,j,RepstoInclude,PlottingStyle,ReusePlot,N_T);
+                            end
+                            AllAxes=[AllAxes; Tfig.axes(:)];
+                            Fig15=Tfig;
+                            Timefig=[Timefig Tfig];
+                        end
+
+                        
                         try
                             linkaxes(AllAxes(:),'x');
                             N_ax=length(AllAxes);
@@ -1770,223 +1813,6 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             end
         end
 
-        % Button pushed function: PlotEnsembleAverageButton
-        function PlotEnsembleAverageButtonPushed(app, event)
-            try
-                tempfighandles=[app.Ensemblefig(:).fighandle];
-                close(tempfighandles);
-            catch
-            end
-            AllAxes=[];
-
-            PlottedReps=app.SelectSubTrialsListBox.Value;
-            EnsFig=[];
-            if(~isempty(PlottedReps))
-
-                Trial_TS_mult=app.TrialDataMult;
-                N_trials=length(Trial_TS_mult);
-
-
-
-
-                for N_T=1:N_trials
-                    RepstoInclude=[];
-                    RunID=Trial_TS_mult(N_T).Info.RunID;
-                    plottedReps_curr=PlottedReps(contains(PlottedReps,RunID));
-                    for j=1:length(plottedReps_curr)
-                        temp=plottedReps_curr{j};
-                        breaks=strfind(temp,';');
-                        breaksdash=strfind(temp,'-');
-                        TrialReps{j}=temp(1:breaks-1);
-                        RepstoInclude(j)=str2double(temp(breaksdash+1:breaks-1));
-                    end
-                    Reps_mult{N_T}=sort(RepstoInclude);
-                end
-
-
-                %% Maneuvering Inputs
-                PlotFields=app.LoggedActuationListBox.Value;
-                N_plots=length(PlotFields);
-                Dtype='ManeuveringInputs';
-                FigName='Maneuvering Inputs';
-                if N_plots>0
-                    Tfig=app.EnsemblePlot(Trial_TS_mult,Dtype,PlotFields,Reps_mult,N_plots,FigName);
-                    AllAxes=[AllAxes; Tfig.axes(:)];
-                    Fig1=Tfig;
-                    EnsFig=[EnsFig Tfig];
-                end
-
-
-                %% MoCap Data - Position
-                clear Tfig
-                PlotFields=app.PositionXYZListBox.Value;
-                N_plots=length(PlotFields);
-                Dtype='Position';
-                FigName='Position';
-                if N_plots>0
-                    Tfig=app.EnsemblePlot(Trial_TS_mult,Dtype,PlotFields,Reps_mult,N_plots,FigName);
-                    AllAxes=[AllAxes; Tfig.axes(:)];
-                    Fig2=Tfig;
-                    EnsFig=[EnsFig Tfig];
-                end
-
-                %% MoCap Data - Position GapFilled
-                clear Tfig
-                PlotFields=app.PositionXYZGapFilledListBox.Value;
-                N_plots=length(PlotFields);
-                Dtype='Position_Gapfilled';
-                FigName='Gap-Filled Position';
-                if N_plots>0
-                    Tfig=app.EnsemblePlot(Trial_TS_mult,Dtype,PlotFields,Reps_mult,N_plots,FigName);
-                    AllAxes=[AllAxes; Tfig.axes(:)];
-                    Fig3=Tfig;
-                    EnsFig=[EnsFig Tfig];
-                end
-
-                %% Euler Angles
-                clear Tfig
-                PlotFields=app.OrientationListBox.Value;
-                N_plots=length(PlotFields);
-                Dtype='Orientation';
-                FigName='Gap-Filled Orientation';
-                if N_plots>0
-                    Tfig=app.EnsemblePlot(Trial_TS_mult,Dtype,PlotFields,Reps_mult,N_plots,FigName);
-
-                    AllAxes=[AllAxes; Tfig.axes(:)];
-                    Fig4=Tfig;
-                    EnsFig=[EnsFig Tfig];
-                end
-
-
-                %% Euler Angles - Gap Filled
-                clear Tfig
-                PlotFields=app.OrientationGapFilledListBox.Value;
-                N_plots=length(PlotFields);
-                Dtype='Orientation_Gapfilled';
-                FigName='Gap-Filled Orientation';
-                if N_plots>0
-                    Tfig=app.EnsemblePlot(Trial_TS_mult,Dtype,PlotFields,Reps_mult,N_plots,FigName);
-                    AllAxes=[AllAxes; Tfig.axes(:)];
-                    Fig5=Tfig;
-                    EnsFig=[EnsFig Tfig];
-                end
-
-                %% IMU-Accelerations
-                clear Tfig
-                PlotFields=app.AccelerationsListBox.Value;
-                N_plots=length(PlotFields);
-                Dtype='Accel';
-                FigName='Accelerations';
-                if N_plots>0
-                    Tfig=app.EnsemblePlot(Trial_TS_mult,Dtype,PlotFields,Reps_mult,N_plots,FigName);
-                    AllAxes=[AllAxes; Tfig.axes(:)];
-                    Fig6=Tfig;
-                    EnsFig=[EnsFig Tfig];
-                end
-
-                %% IMU-Gyroscope
-                clear Tfig
-                PlotFields=app.AngularRatesListBox.Value;
-                N_plots=length(PlotFields);
-                Dtype='AngularRates';
-                FigName='Angular Rates';
-                if N_plots>0
-                    Tfig=app.EnsemblePlot(Trial_TS_mult,Dtype,PlotFields,Reps_mult,N_plots,FigName);
-                    AllAxes=[AllAxes; Tfig.axes(:)];
-                    Fig7=Tfig;
-                    EnsFig=[EnsFig Tfig];
-                end
-
-                %% Velocities
-                clear Tfig;
-                PlotFields=app.VelocityGapFilledListBox.Value;
-                N_plots=length(PlotFields);
-                Dtype='Velocities_Gapfilled';
-                FigName='Model Velocities';
-                if N_plots>0
-                    Tfig=app.EnsemblePlot(Trial_TS_mult,Dtype,PlotFields,Reps_mult,N_plots,FigName);
-                    AllAxes=[AllAxes; Tfig.axes(:)];
-                    Fig8=Tfig;
-                    EnsFig=[EnsFig Tfig];
-                end
-
-
-                %% Deep Water Acoustics
-                clear Tfig;
-                PlotFields=app.DeepWaterAcousticsListBox.Value;
-                N_plots=length(PlotFields);
-                Dtype='WaveGauges';
-                FigName='Deep Water Acoustic Wave Gauges';
-                if N_plots>0
-                    Tfig=app.EnsemblePlot(Trial_TS_mult,Dtype,PlotFields,Reps_mult,N_plots,FigName);
-                    AllAxes=[AllAxes; Tfig.axes(:)];
-                    Fig9=Tfig;
-                    EnsFig=[EnsFig Tfig];
-                end
-
-                %% DeltaFluid-RAW
-                % Determine which (if either) of the raw breaker sensor
-                % outputs to use.
-                if and(app.AcousticGaugesCheckBox.Value,Trial_TS_mult(1).Info.IncludedData.NRLSenix==1)
-                    %% Deep Water Acoustics
-                    clear Tfig;
-                    PlotFields=app.RAWBreakerMeasurementsListBox.Value;
-                    N_plots=length(PlotFields);
-                    Dtype='NRLAcoustics';
-                    FigName='Raw Acoustic Measurements of Breakers';
-                    if N_plots>0
-                        Tfig=app.EnsemblePlot(Trial_TS_mult,Dtype,PlotFields,Reps_mult,N_plots,FigName);
-                        AllAxes=[AllAxes; Tfig.axes(:)];
-                        Fig10a=Tfig;
-                        EnsFig=[EnsFig Tfig];
-                    end
-                end
-
-
-                if app.ApproximatesurfacecontourCheckBox.Value
-                    clear Tfig;
-                    PlotFields=app.FusedBreakerMeasurementsListBox.Value;
-                    N_plots=length(PlotFields);
-                    Dtype='DeltaFluid_surface_contour_fused';
-                    FigName='Approximate water surface contour (fused)';
-                    if N_plots>0
-                        Tfig=app.EnsemblePlot(Trial_TS_mult,Dtype,PlotFields,Reps_mult,N_plots,FigName);
-                        AllAxes=[AllAxes; Tfig.axes(:)];
-                        Fig11a=Tfig;
-                        EnsFig=[EnsFig Tfig];
-                    end
-                end
-
-
-                %% ROS Data
-                clear Tfig;
-                PlotFields=app.ROSCommandsListBox.Value;
-                N_plots=length(PlotFields);
-
-                Dtype='ROSCommands';
-                FigName='ROS logged commands';
-                if N_plots>0
-                    Tfig=app.EnsemblePlot(Trial_TS_mult,Dtype,PlotFields,Reps_mult,N_plots,FigName);
-                    AllAxes=[AllAxes; Tfig.axes(:)];
-                    Fig12=Tfig;
-                    EnsFig=[EnsFig Tfig];
-                end
-
-                try
-                    linkaxes(AllAxes(:),'x');
-                    N_ax=length(AllAxes);
-                    for n_ax=1:N_ax
-                        AllAxes(n_ax).YLabel.Interpreter='none';
-                        AllAxes(n_ax).Title.Interpreter='none';
-                    end
-                catch
-                end
-                app.Ensemblefig=EnsFig;
-            else
-                msgbox('Select at least one sub-trial')
-            end
-        end
-
         % Button pushed function: FFTButton
         function FFTButtonPushed(app, event)
             try
@@ -2085,7 +1911,7 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
 
                 %% IMU-Accelerations
                 clear Tfig
-                PlotFields=app.AccelerationsListBox.Value;
+                PlotFields=app.LinearAccelerationsListBox.Value;
                 N_plots=length(PlotFields);
                 Dtype='Accel';
                 FigName='Accelerations';
@@ -2225,8 +2051,8 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             end
         end
 
-        % Button pushed function: PlotCustomXvsYButton
-        function PlotCustomXvsYButtonPushed(app, event)
+        % Button pushed function: PlotEnsembleXvsYButton
+        function PlotEnsembleXvsYButtonPushed(app, event)
             [datablock,signalnames,units]=app.GetInterpolatedDataBlock();
 
             xsrc=listdlg('PromptString','Select one independent (X) variable.','ListString',signalnames,'SelectionMode','single');
@@ -2300,14 +2126,14 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.LoggedActuationLabel = uilabel(app.UIWaveBasinDataViewerUIFigure);
             app.LoggedActuationLabel.HorizontalAlignment = 'center';
             app.LoggedActuationLabel.FontWeight = 'bold';
-            app.LoggedActuationLabel.Position = [431 449 83 28];
+            app.LoggedActuationLabel.Position = [447 449 83 28];
             app.LoggedActuationLabel.Text = {'Logged '; 'Actuation'};
 
             % Create LoggedActuationListBox
             app.LoggedActuationListBox = uilistbox(app.UIWaveBasinDataViewerUIFigure);
             app.LoggedActuationListBox.Items = {};
             app.LoggedActuationListBox.Tooltip = {'MQS inputs/actuations, measured using on-board datalogging. '};
-            app.LoggedActuationListBox.Position = [418 203 110 241];
+            app.LoggedActuationListBox.Position = [434 203 110 241];
             app.LoggedActuationListBox.Value = {};
 
             % Create PositionXYZLabel
@@ -2328,14 +2154,14 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.VelocityGapFilledListBoxLabel = uilabel(app.UIWaveBasinDataViewerUIFigure);
             app.VelocityGapFilledListBoxLabel.HorizontalAlignment = 'center';
             app.VelocityGapFilledListBoxLabel.FontWeight = 'bold';
-            app.VelocityGapFilledListBoxLabel.Position = [229 289 72 28];
+            app.VelocityGapFilledListBoxLabel.Position = [193 289 72 28];
             app.VelocityGapFilledListBoxLabel.Text = {'Velocity'; '(Gap-Filled)'};
 
             % Create VelocityGapFilledListBox
             app.VelocityGapFilledListBox = uilistbox(app.UIWaveBasinDataViewerUIFigure);
             app.VelocityGapFilledListBox.Items = {};
             app.VelocityGapFilledListBox.Tooltip = {'Velocities of MQS datum. Measured in global coordinate system. Fused with IMU data to fill gaps and reduce noise.'};
-            app.VelocityGapFilledListBox.Position = [230 206 69 81];
+            app.VelocityGapFilledListBox.Position = [194 206 69 81];
             app.VelocityGapFilledListBox.Value = {};
 
             % Create PlotSelectionButton
@@ -2344,7 +2170,7 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.PlotSelectionButton.FontSize = 14;
             app.PlotSelectionButton.FontWeight = 'bold';
             app.PlotSelectionButton.Tooltip = {'Plot all selected signals for all selected sub-trial replications.'};
-            app.PlotSelectionButton.Position = [425 116 106 46];
+            app.PlotSelectionButton.Position = [430 80 106 46];
             app.PlotSelectionButton.Text = 'Plot Selection';
 
             % Create PlottingStyleButtonGroup
@@ -2430,32 +2256,32 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.OrientationGapFilledListBox.Position = [113 205 73 81];
             app.OrientationGapFilledListBox.Value = {};
 
-            % Create AccelerationsListBoxLabel
-            app.AccelerationsListBoxLabel = uilabel(app.UIWaveBasinDataViewerUIFigure);
-            app.AccelerationsListBoxLabel.HorizontalAlignment = 'center';
-            app.AccelerationsListBoxLabel.FontWeight = 'bold';
-            app.AccelerationsListBoxLabel.Position = [223 450 84 22];
-            app.AccelerationsListBoxLabel.Text = 'Accelerations';
+            % Create LinearAccelerationsListBoxLabel
+            app.LinearAccelerationsListBoxLabel = uilabel(app.UIWaveBasinDataViewerUIFigure);
+            app.LinearAccelerationsListBoxLabel.HorizontalAlignment = 'center';
+            app.LinearAccelerationsListBoxLabel.FontWeight = 'bold';
+            app.LinearAccelerationsListBoxLabel.Position = [265 287 84 28];
+            app.LinearAccelerationsListBoxLabel.Text = {'Linear'; 'Accelerations'};
 
-            % Create AccelerationsListBox
-            app.AccelerationsListBox = uilistbox(app.UIWaveBasinDataViewerUIFigure);
-            app.AccelerationsListBox.Items = {};
-            app.AccelerationsListBox.Tooltip = {'Accelerations of the MQS, measured at the location of the IMU and reported in MQS coordinate system.'};
-            app.AccelerationsListBox.Position = [231 364 69 81];
-            app.AccelerationsListBox.Value = {};
+            % Create LinearAccelerationsListBox
+            app.LinearAccelerationsListBox = uilistbox(app.UIWaveBasinDataViewerUIFigure);
+            app.LinearAccelerationsListBox.Items = {};
+            app.LinearAccelerationsListBox.Tooltip = {'Accelerations of the MQS, measured at the location of the IMU and reported in MQS coordinate system.'};
+            app.LinearAccelerationsListBox.Position = [273 207 69 81];
+            app.LinearAccelerationsListBox.Value = {};
 
             % Create AngularRatesListBoxLabel
             app.AngularRatesListBoxLabel = uilabel(app.UIWaveBasinDataViewerUIFigure);
             app.AngularRatesListBoxLabel.HorizontalAlignment = 'center';
             app.AngularRatesListBoxLabel.FontWeight = 'bold';
-            app.AngularRatesListBoxLabel.Position = [317 450 54 28];
+            app.AngularRatesListBoxLabel.Position = [359 293 54 28];
             app.AngularRatesListBoxLabel.Text = {'Angular '; 'Rates'};
 
             % Create AngularRatesListBox
             app.AngularRatesListBox = uilistbox(app.UIWaveBasinDataViewerUIFigure);
             app.AngularRatesListBox.Items = {};
             app.AngularRatesListBox.Tooltip = {'Angular velocities of the MQS, measured at the location of the IMU and reported in MQS coordinate system.'};
-            app.AngularRatesListBox.Position = [306 364 69 81];
+            app.AngularRatesListBox.Position = [348 207 69 81];
             app.AngularRatesListBox.Value = {};
 
             % Create DeepWaterAcousticsLabel
@@ -2499,7 +2325,7 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.RawMoCapDataLabel.HorizontalAlignment = 'center';
             app.RawMoCapDataLabel.FontSize = 14;
             app.RawMoCapDataLabel.FontAngle = 'italic';
-            app.RawMoCapDataLabel.Position = [41 485 150 22];
+            app.RawMoCapDataLabel.Position = [76 477 150 22];
             app.RawMoCapDataLabel.Text = 'Raw MoCap Data';
 
             % Create GapFilledKalmanFilteredMoCapDataLabel
@@ -2507,15 +2333,15 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.GapFilledKalmanFilteredMoCapDataLabel.HorizontalAlignment = 'center';
             app.GapFilledKalmanFilteredMoCapDataLabel.FontSize = 14;
             app.GapFilledKalmanFilteredMoCapDataLabel.FontAngle = 'italic';
-            app.GapFilledKalmanFilteredMoCapDataLabel.Position = [26 315 157 41];
-            app.GapFilledKalmanFilteredMoCapDataLabel.Text = {'Gap-Filled / Kalman-'; 'Filtered MoCap Data'};
+            app.GapFilledKalmanFilteredMoCapDataLabel.Position = [8 315 266 41];
+            app.GapFilledKalmanFilteredMoCapDataLabel.Text = 'Gap-Filled / Kalman-Filtered MoCap Data';
 
             % Create IMUDataLabel
             app.IMUDataLabel = uilabel(app.UIWaveBasinDataViewerUIFigure);
             app.IMUDataLabel.HorizontalAlignment = 'center';
             app.IMUDataLabel.FontSize = 14;
             app.IMUDataLabel.FontAngle = 'italic';
-            app.IMUDataLabel.Position = [242 485 141 22];
+            app.IMUDataLabel.Position = [267 324 141 22];
             app.IMUDataLabel.Text = 'IMU Data';
 
             % Create WaveMeasurementsLabel
@@ -2532,7 +2358,7 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.CSVExportButton.FontSize = 14;
             app.CSVExportButton.FontWeight = 'bold';
             app.CSVExportButton.Tooltip = {'Export ALL data (except DeltaFluid wetting field data) to tab-delimited ASCII files. One file will be created per selected sub-trial.'};
-            app.CSVExportButton.Position = [667 64 106 46];
+            app.CSVExportButton.Position = [672 23 106 46];
             app.CSVExportButton.Text = {'CSV '; 'Export'};
 
             % Create PlayVideosButton
@@ -2541,7 +2367,7 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.PlayVideosButton.FontSize = 14;
             app.PlayVideosButton.FontWeight = 'bold';
             app.PlayVideosButton.Tooltip = {'Opens a pop-out window with a table of hyperlinked videos available for the currently-loaded run. Videos will load in the system''s default internet browser.'};
-            app.PlayVideosButton.Position = [667 116 106 46];
+            app.PlayVideosButton.Position = [430 23 106 46];
             app.PlayVideosButton.Text = {'Play '; 'Videos'};
 
             % Create FusedBreakerMeasurementsLabel
@@ -2570,14 +2396,14 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.ROSCommandsListBoxLabel = uilabel(app.UIWaveBasinDataViewerUIFigure);
             app.ROSCommandsListBoxLabel.HorizontalAlignment = 'center';
             app.ROSCommandsListBoxLabel.FontWeight = 'bold';
-            app.ROSCommandsListBoxLabel.Position = [553 449 83 28];
+            app.ROSCommandsListBoxLabel.Position = [569 449 83 28];
             app.ROSCommandsListBoxLabel.Text = {'ROS '; 'Commands'};
 
             % Create ROSCommandsListBox
             app.ROSCommandsListBox = uilistbox(app.UIWaveBasinDataViewerUIFigure);
             app.ROSCommandsListBox.Items = {};
             app.ROSCommandsListBox.Tooltip = {'MQS command signals broadcast from the ROS control computer. Note: synchronization with other signal types may be imperfect due to software timestamping.'};
-            app.ROSCommandsListBox.Position = [538 203 113 241];
+            app.ROSCommandsListBox.Position = [554 203 113 241];
             app.ROSCommandsListBox.Value = {};
 
             % Create Image
@@ -2706,22 +2532,13 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.FilesCurrentlyOpenListBox.Position = [33 538 191 50];
             app.FilesCurrentlyOpenListBox.Value = {};
 
-            % Create PlotEnsembleAverageButton
-            app.PlotEnsembleAverageButton = uibutton(app.UIWaveBasinDataViewerUIFigure, 'push');
-            app.PlotEnsembleAverageButton.ButtonPushedFcn = createCallbackFcn(app, @PlotEnsembleAverageButtonPushed, true);
-            app.PlotEnsembleAverageButton.FontSize = 14;
-            app.PlotEnsembleAverageButton.FontWeight = 'bold';
-            app.PlotEnsembleAverageButton.Tooltip = {'Plot the ensemble mean and standard deviation of the selected runs and sub-trials.'};
-            app.PlotEnsembleAverageButton.Position = [425 64 106 46];
-            app.PlotEnsembleAverageButton.Text = {'Plot Ensemble'; 'Average'};
-
             % Create FFTButton
             app.FFTButton = uibutton(app.UIWaveBasinDataViewerUIFigure, 'push');
             app.FFTButton.ButtonPushedFcn = createCallbackFcn(app, @FFTButtonPushed, true);
             app.FFTButton.FontSize = 14;
             app.FFTButton.FontWeight = 'bold';
             app.FFTButton.Tooltip = {'Plot the FFT of selected signals during the specified time window.'};
-            app.FFTButton.Position = [547 116 106 46];
+            app.FFTButton.Position = [551 80 84 46];
             app.FFTButton.Text = 'FFT';
 
             % Create CloseAllFiguresButton
@@ -2730,7 +2547,7 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.CloseAllFiguresButton.FontSize = 14;
             app.CloseAllFiguresButton.FontWeight = 'bold';
             app.CloseAllFiguresButton.Tooltip = {'Closes all open plotting windows.'};
-            app.CloseAllFiguresButton.Position = [425 16 105 46];
+            app.CloseAllFiguresButton.Position = [552 23 105 46];
             app.CloseAllFiguresButton.Text = {'Close All '; 'Figures'};
 
             % Create OpenTrialClusterGroupButton
@@ -2741,28 +2558,28 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.OpenTrialClusterGroupButton.Position = [33 655 193 30];
             app.OpenTrialClusterGroupButton.Text = 'Open Trial Cluster / Group';
 
-            % Create PlotCustomXvsYButton
-            app.PlotCustomXvsYButton = uibutton(app.UIWaveBasinDataViewerUIFigure, 'push');
-            app.PlotCustomXvsYButton.ButtonPushedFcn = createCallbackFcn(app, @PlotCustomXvsYButtonPushed, true);
-            app.PlotCustomXvsYButton.FontSize = 14;
-            app.PlotCustomXvsYButton.FontWeight = 'bold';
-            app.PlotCustomXvsYButton.Tooltip = {'Plot ensemble means and 1-sigma envelopes of selected (sub)trials with user-selected X-Y pairs, parameterized by time.'};
-            app.PlotCustomXvsYButton.Position = [547 64 106 46];
-            app.PlotCustomXvsYButton.Text = {'Plot Custom '; 'X vs Y'};
+            % Create PlotEnsembleXvsYButton
+            app.PlotEnsembleXvsYButton = uibutton(app.UIWaveBasinDataViewerUIFigure, 'push');
+            app.PlotEnsembleXvsYButton.ButtonPushedFcn = createCallbackFcn(app, @PlotEnsembleXvsYButtonPushed, true);
+            app.PlotEnsembleXvsYButton.FontSize = 14;
+            app.PlotEnsembleXvsYButton.FontWeight = 'bold';
+            app.PlotEnsembleXvsYButton.Tooltip = {'Plot ensemble means and 1-sigma envelopes of selected (sub)trials with user-selected X-Y pairs, parameterized by time.'};
+            app.PlotEnsembleXvsYButton.Position = [650 80 127 46];
+            app.PlotEnsembleXvsYButton.Text = {'Plot Ensemble'; 'X vs Y'};
 
-            % Create VelocityBodyFixedLabel
-            app.VelocityBodyFixedLabel = uilabel(app.UIWaveBasinDataViewerUIFigure);
-            app.VelocityBodyFixedLabel.HorizontalAlignment = 'center';
-            app.VelocityBodyFixedLabel.FontWeight = 'bold';
-            app.VelocityBodyFixedLabel.Position = [301 289 79 28];
-            app.VelocityBodyFixedLabel.Text = {'Velocity'; '(Body-Fixed)'};
+            % Create VelocitiesVehicleCoordsListBoxLabel
+            app.VelocitiesVehicleCoordsListBoxLabel = uilabel(app.UIWaveBasinDataViewerUIFigure);
+            app.VelocitiesVehicleCoordsListBoxLabel.HorizontalAlignment = 'center';
+            app.VelocitiesVehicleCoordsListBoxLabel.FontWeight = 'bold';
+            app.VelocitiesVehicleCoordsListBoxLabel.Position = [296 445 100 28];
+            app.VelocitiesVehicleCoordsListBoxLabel.Text = {'Velocities '; '(Vehicle Coords)'};
 
-            % Create VelocityBodyFixedListBox
-            app.VelocityBodyFixedListBox = uilistbox(app.UIWaveBasinDataViewerUIFigure);
-            app.VelocityBodyFixedListBox.Items = {};
-            app.VelocityBodyFixedListBox.Tooltip = {'Velocities of MQS datum. Measured in global coordinate system. Fused with IMU data to fill gaps and reduce noise.'};
-            app.VelocityBodyFixedListBox.Position = [305 206 69 81];
-            app.VelocityBodyFixedListBox.Value = {};
+            % Create VelocitiesVehicleCoordsListBox
+            app.VelocitiesVehicleCoordsListBox = uilistbox(app.UIWaveBasinDataViewerUIFigure);
+            app.VelocitiesVehicleCoordsListBox.Items = {};
+            app.VelocitiesVehicleCoordsListBox.Tooltip = {'Velocities of MQS, resolved in MQS coordinate system. Computed from gap-filled data if available and raw data if no gap-filled pose data exist.'};
+            app.VelocitiesVehicleCoordsListBox.Position = [310 362 69 81];
+            app.VelocitiesVehicleCoordsListBox.Value = {};
 
             % Create GroundContactLabel
             app.GroundContactLabel = uilabel(app.UIWaveBasinDataViewerUIFigure);
@@ -2778,13 +2595,19 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
             app.GroundContactListBox.Position = [679 203 126 63];
             app.GroundContactListBox.Value = {};
 
-            % Create VelocitiesLabel
-            app.VelocitiesLabel = uilabel(app.UIWaveBasinDataViewerUIFigure);
-            app.VelocitiesLabel.HorizontalAlignment = 'center';
-            app.VelocitiesLabel.FontSize = 14;
-            app.VelocitiesLabel.FontAngle = 'italic';
-            app.VelocitiesLabel.Position = [230 315 146 41];
-            app.VelocitiesLabel.Text = 'Velocities';
+            % Create VelocityListBoxLabel
+            app.VelocityListBoxLabel = uilabel(app.UIWaveBasinDataViewerUIFigure);
+            app.VelocityListBoxLabel.HorizontalAlignment = 'center';
+            app.VelocityListBoxLabel.FontWeight = 'bold';
+            app.VelocityListBoxLabel.Position = [205 452 51 22];
+            app.VelocityListBoxLabel.Text = 'Velocity';
+
+            % Create VelocityListBox
+            app.VelocityListBox = uilistbox(app.UIWaveBasinDataViewerUIFigure);
+            app.VelocityListBox.Items = {};
+            app.VelocityListBox.Tooltip = {'Velocities of MQS datum. Measured in global coordinate system. Calculated from a 2nd-order, 5-point moving slope of the MQS position.'};
+            app.VelocityListBox.Position = [195 363 69 81];
+            app.VelocityListBox.Value = {};
 
             % Show the figure after all components are created
             app.UIWaveBasinDataViewerUIFigure.Visible = 'on';
@@ -2795,7 +2618,7 @@ set(findall(ff,'-property','FontName'),'FontName','Times New Roman');
     methods (Access = public)
 
         % Construct app
-        function app = UI_MQS_DataViewer_V4_Script
+        function app = UI_MQS_DataViewer_V4p0
 
             % Create UIFigure and components
             createComponents(app)
